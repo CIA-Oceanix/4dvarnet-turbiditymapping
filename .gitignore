@@ -1,0 +1,9 @@
+**/__pycache__
+outputs/**
+logs
+multirun
+lightning_logs
+scratches
+tmp
+data/**
+jobs
