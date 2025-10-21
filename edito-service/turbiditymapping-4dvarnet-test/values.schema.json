@@ -1,0 +1,272 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "type": "object",
+  "properties": {
+    "service": {
+      "description": "Service specific configuration",
+      "type": "object",
+      "properties": {
+        "image": {
+          "description": "image docker",
+          "type": "object",
+          "hidden": true,
+          "properties": {
+            "pullPolicy": {
+              "type": "string",
+              "description": "option when pulling the docker image",
+              "hidden": true,
+              "default": "IfNotPresent",
+              "enum": [
+                "IfNotPresent",
+                "Always",
+                "Never"
+              ]
+            },
+            "version": {
+              "description": "supported versions",
+              "type": "string",
+              "hidden": true,
+              "listEnum": [
+                "ghcr.io/cia-oceanix/4dvarnet-turbiditymapping:1.3",
+                "registry.gitlab.com/odyssey-edito/images/turbiditymapping-4dvarnet:1.1-edito"
+              ],
+              "render": "list",
+              "default": "ghcr.io/cia-oceanix/4dvarnet-turbiditymapping:1.3"
+            }
+          }
+        }
+      }
+    },
+    "resources": {
+      "description": "Your service will have at least the requested resources and never more than its limits. No limit for a resource and you can consume everything left on the host machine.",
+      "type": "object",
+      "properties": {
+        "requests": {
+          "description": "Guaranteed resources",
+          "type": "object",
+          "properties": {
+            "cpu": {
+              "description": "The amount of cpu guaranteed",
+              "title": "CPU",
+              "type": "string",
+              "default": "100m",
+              "render": "slider",
+              "sliderMin": 50,
+              "sliderMax": 40000,
+              "sliderStep": 50,
+              "sliderUnit": "m",
+              "sliderExtremity": "down",
+              "sliderExtremitySemantic": "guaranteed",
+              "sliderRangeId": "cpu",
+              "x-onyxia": {
+                "overwriteDefaultWith": "region.resources.cpuRequest",
+                "useRegionSliderConfig": "cpu"
+              }
+            },
+            "memory": {
+              "description": "The amount of memory guaranteed",
+              "title": "memory",
+              "type": "string",
+              "default": "8Gi",
+              "render": "slider",
+              "sliderMin": 1,
+              "sliderMax": 200,
+              "sliderStep": 1,
+              "sliderUnit": "Gi",
+              "sliderExtremity": "down",
+              "sliderExtremitySemantic": "guaranteed",
+              "sliderRangeId": "memory",
+              "x-onyxia": {
+                "overwriteDefaultWith": "region.resources.memoryRequest",
+                "useRegionSliderConfig": "memory"
+              }
+            }
+          }
+        },
+        "limits": {
+          "description": "max resources",
+          "type": "object",
+          "properties": {
+            "cpu": {
+              "description": "The maximum amount of cpu",
+              "title": "CPU",
+              "type": "string",
+              "default": "30000m",
+              "render": "slider",
+              "sliderMin": 50,
+              "sliderMax": 40000,
+              "sliderStep": 50,
+              "sliderUnit": "m",
+              "sliderExtremity": "up",
+              "sliderExtremitySemantic": "Maximum",
+              "sliderRangeId": "cpu",
+              "x-onyxia": {
+                "overwriteDefaultWith": "region.resources.cpuLimit",
+                "useRegionSliderConfig": "cpu"
+              }
+            },
+            "memory": {
+              "description": "The maximum amount of memory",
+              "title": "Memory",
+              "type": "string",
+              "default": "24Gi",
+              "render": "slider",
+              "sliderMin": 1,
+              "sliderMax": 200,
+              "sliderStep": 1,
+              "sliderUnit": "Gi",
+              "sliderExtremity": "up",
+              "sliderExtremitySemantic": "Maximum",
+              "sliderRangeId": "memory",
+              "x-onyxia": {
+                "overwriteDefaultWith": "region.resources.memoryLimit",
+                "useRegionSliderConfig": "memory"
+              }
+            },
+            "nvidia.com/gpu": {
+              "description": "GPU to allocate to this instance. This is also requested",
+              "title": "Nvidia GPU",
+              "type": "string",
+              "default": "1",
+              "render": "slider",
+              "sliderMin": 1,
+              "sliderMax": 1,
+              "sliderStep": 1,
+              "sliderUnit": "",
+              "x-onyxia": {
+                "overwriteDefaultWith": "region.resources.gpu",
+                "useRegionSliderConfig": "gpu"
+              }
+            }
+          }
+        }
+      }
+    },
+    "ingress": {
+      "type": "object",
+      "form": true,
+      "title": "Ingress Details",
+      "properties": {
+        "enabled": {
+          "description": "Enable Ingress",
+          "type": "boolean",
+          "default": true,
+          "x-onyxia": {
+            "hidden": true,
+            "overwriteDefaultWith": "k8s.ingress"
+          }
+        },
+        "hostname": {
+          "type": "string",
+          "form": true,
+          "title": "Hostname",
+          "x-onyxia": {
+            "hidden": true,
+            "overwriteDefaultWith": "{{project.id}}-{{k8s.randomSubdomain}}-0.{{k8s.domain}}"
+          }
+        }
+      }
+    },
+    "security": {
+      "description": "security specific configuration",
+      "type": "object",
+      "properties": {
+        "password": {
+          "type": "string",
+          "description": "Password",
+          "default": "changeme",
+          "render": "password",
+          "hidden": true,
+          "x-onyxia": {
+            "overwriteDefaultWith": "{{service.oneTimePassword}}",
+            "overwriteSchemaWith": "ide/password"
+          }
+        },
+        "networkPolicy": {
+          "type": "object",
+          "description": "Define access policy to the service",
+          "x-onyxia": {
+            "overwriteSchemaWith": "network-policy.json"
+          },
+          "properties": {
+            "enabled": {
+              "type": "boolean",
+              "title": "Enable network policy",
+              "description": "Only pod from the same namespace will be allowed",
+              "default": false,
+              "x-onyxia": {
+                "overwriteDefaultWith": "region.defaultNetworkPolicy"
+              }
+            },
+            "from": {
+              "type": "array",
+              "description": "Array of source allowed to have network access to your service",
+              "default": [],
+              "x-onyxia": {
+                "hidden": true,
+                "overwriteDefaultWith": "region.from"
+              }
+            }
+          }
+        }
+      }
+    },
+    "userPreferences": {
+      "description": "User Preferences",
+      "type": "object",
+      "properties": {
+        "darkMode": {
+          "type": "boolean",
+          "description": "dark mode is or is not enabled",
+          "default": false,
+          "x-onyxia": {
+            "hidden": true,
+            "overwriteDefaultWith": "user.darkMode"
+          }
+        },
+        "language": {
+          "type": "string",
+          "description": "Preferred language",
+          "default": "en",
+          "x-onyxia": {
+            "hidden": true,
+            "overwriteDefaultWith": "user.lang"
+          }
+        }
+      }
+    },
+    "nodeSelector": {
+      "type": "object",
+      "description": "NodeSelector",
+      "default": {},
+      "x-onyxia": {
+        "overwriteDefaultWith": "region.nodeSelector",
+        "overwriteSchemaWith": "nodeSelector-gpu.json"
+      }
+    },
+    "tolerations": {
+      "type": "array",
+      "description": "Array of tolerations",
+      "default": [],
+      "x-onyxia": {
+        "hidden": true,
+        "overwriteDefaultWith": "region.tolerations",
+        "overwriteSchemaWith": "tolerations.json"
+      }
+    },
+    "global": {
+      "description": "Suspend",
+      "type": "object",
+      "properties": {
+        "suspend": {
+          "type": "boolean",
+          "description": "Suspend this service",
+          "default": false,
+          "x-onyxia": {
+            "hidden": true
+          }
+        }
+      }
+    }
+  }
+}
