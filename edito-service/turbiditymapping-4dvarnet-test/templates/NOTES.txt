@@ -1,0 +1,23 @@
+
+{{- if eq .Values.userPreferences.language "fr" }}
+
+Votre environnement Jupyterlab pour Turbidity Mapping-4DVarNet  est en cours de déploiement.
+
+{{- if .Values.ingress.enabled }}
+- Vous pouvez vous connecter à ce Jupyter avec votre navigateur en utilisant ce [lien](http{{ if $.Values.ingress.tls }}s{{ end }}://{{ .Values.ingress.hostname }}).
+{{- end }}
+{{  (.Values.message).fr }}
+- Votre password: {{ .Values.security.password }}
+
+{{- else }}
+
+Your Turbidity Mapping-4DVarNet Jupyterlab environment is being deployed.
+
+{{- if .Values.ingress.enabled }}
+- You can connect to this jupyter with your browser on this [link](http{{ if $.Values.ingress.tls }}s{{ end }}://{{ .Values.ingress.hostname }})
+{{- end }}
+
+{{  (.Values.message).en }}
+- Your password: {{ .Values.security.password }}
+
+{{- end }}
