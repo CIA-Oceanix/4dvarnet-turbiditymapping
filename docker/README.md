@@ -55,7 +55,7 @@ docker push ghcr.io/cia-oceanix/4dvarnet-turbiditymapping:$IMAGE_TAG
 - stable
 ```bash
 # Define TAG used for stable
-export TAG_FOR_STABLE=1.3
+export TAG_FOR_STABLE=1.4
 
 # Pull image
 docker pull ghcr.io/cia-oceanix/4dvarnet-turbiditymapping:$TAG_FOR_STABLE
@@ -67,7 +67,7 @@ docker push ghcr.io/cia-oceanix/4dvarnet-turbiditymapping:stable
 - latest
 ```bash
 # Define TAG used for latest 
-export TAG_FOR_LATEST=0.1.0
+export TAG_FOR_LATEST=1.4
 
 # Pull image
 docker pull ghcr.io/cia-oceanix/4dvarnet-turbiditymapping:$TAG_FOR_LATEST
